@@ -1,0 +1,107 @@
+/* Little Reader design system: the night-navy / warm-peach look of the pitch deck and demo video.
+   Role colours never change: child = coral, parent = blue, AI (Hudhud) = yellow, bridge words = mint. */
+:root{
+  --night:#1B1F5E; --night2:#2E2F86; --night3:#3A3593; --ink:#1F2547; --muted:#5D6689; --line:#E7E2F3;
+  --cream:#FFF8F3; --peach:#FFE9DC; --card:#FFFFFF;
+  --coral:#F26B4F; --coral-deep:#D9533A; --coral-soft:#FFE6E1;
+  --orange:#F59A6A; --yellow:#FFC23D; --yellow-soft:#FFF3CF;
+  --mint:#1FA383; --mint-soft:#D6F5EB; --teal:#25A69A;
+  --purple:#7A5AF0; --purple-soft:#ECE8FF;
+  --blue:#2F6FE0; --blue-soft:#E3EDFF;
+  --r-s:12px; --r-m:20px; --r-l:28px;
+  --shadow:0 12px 30px rgba(31,37,71,.10);
+  --f-head:"Fredoka","Baloo Bhaijaan 2",system-ui,sans-serif;
+  --f-body:"Nunito","Tajawal",system-ui,sans-serif;
+  --f-read:"Andika","Noto Naskh Arabic",system-ui,serif;
+  color-scheme:light;
+}
+:root[lang=ar]{--f-head:"Baloo Bhaijaan 2","Tajawal",system-ui,sans-serif;--f-body:"Tajawal","Baloo Bhaijaan 2",system-ui,sans-serif;--f-read:"Noto Naskh Arabic","Tajawal",serif}
+:root[lang=ar] *{letter-spacing:0!important}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--f-body);font-size:17px;line-height:1.6;overflow-x:hidden}
+h1,h2,h3,h4{font-family:var(--f-head);line-height:1.15;margin:0;font-weight:700;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+img{max-width:100%;display:block}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.ui-icon{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.18em;flex-shrink:0;pointer-events:none;overflow:visible}
+.art svg.ui-icon:not([data-scene-icon]){position:static;inset:auto;width:1.15em;height:1.15em}
+.nb .ui-icon{width:1.35rem;height:1.35rem}
+:focus-visible{outline:3px solid var(--purple);outline-offset:3px;border-radius:10px}
+.wrap{width:min(1180px,100% - 32px);margin-inline:auto}
+.eyebrow{font-weight:800;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;color:var(--coral)}
+.muted{color:var(--muted)}
+.center{text-align:center}
+
+/* themes */
+.night-bg{background:radial-gradient(1200px 600px at 85% -10%,rgba(255,194,61,.16),transparent 60%),linear-gradient(160deg,#151a55 0%,var(--night2) 55%,#4b3ea6 100%);color:#fff;position:relative;isolation:isolate}
+.night-bg::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.8;
+  background-image:radial-gradient(1.6px 1.6px at 8% 18%,#fff 50%,transparent 51%),radial-gradient(1.2px 1.2px at 22% 62%,#fff 50%,transparent 51%),radial-gradient(1.8px 1.8px at 38% 12%,#fff 50%,transparent 51%),radial-gradient(1.2px 1.2px at 52% 40%,#fff 50%,transparent 51%),radial-gradient(1.6px 1.6px at 68% 78%,#fff 50%,transparent 51%),radial-gradient(1.2px 1.2px at 80% 26%,#fff 50%,transparent 51%),radial-gradient(1.6px 1.6px at 92% 58%,#fff 50%,transparent 51%),radial-gradient(1.1px 1.1px at 30% 88%,#fff 50%,transparent 51%),radial-gradient(1.4px 1.4px at 60% 8%,#fff 50%,transparent 51%),radial-gradient(1.2px 1.2px at 12% 80%,#fff 50%,transparent 51%);
+  background-size:520px 420px}
+.peach-bg{background:radial-gradient(900px 500px at 100% 0%,#FFE0CF,transparent 60%),radial-gradient(700px 500px at 0% 100%,#FFF0E3,transparent 60%),var(--cream)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:999px;padding:14px 26px;font-weight:800;font-size:1.04rem;text-decoration:none;white-space:nowrap;transition:transform .15s ease,box-shadow .15s ease,opacity .15s;font-family:var(--f-body)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.55;cursor:default;transform:none}
+.btn-coral{background:var(--coral);color:#fff;box-shadow:0 6px 0 var(--coral-deep),0 12px 24px rgba(242,107,79,.25)}
+.btn-night{background:var(--night);color:#fff;box-shadow:0 6px 0 #0d1040}
+.btn-blue{background:var(--blue);color:#fff;box-shadow:0 6px 0 #1D4FA8}
+.btn-ghost{background:#fff;color:var(--ink);box-shadow:0 0 0 2px var(--line) inset,0 5px 0 var(--line)}
+.night-bg .btn-ghost{background:rgba(255,255,255,.1);color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.25) inset}
+.btn-lg{padding:18px 34px;font-size:1.18rem}
+.btn-sm{padding:9px 16px;font-size:.92rem}
+.btn-block{width:100%}
+.link{background:none;border:0;padding:0;font-weight:800;text-decoration:underline;color:inherit}
+
+/* cards & chips */
+.card{background:var(--card);border-radius:var(--r-l);padding:24px;box-shadow:var(--shadow)}
+.card-soft{background:#fff;border-radius:var(--r-m);padding:18px;box-shadow:0 0 0 1.5px var(--line) inset}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 12px;font-weight:800;font-size:.84rem;white-space:nowrap;max-width:100%}
+p.chip{white-space:normal;line-height:1.45;border-radius:16px}
+.chip-child{background:var(--coral-soft);color:#B9361F}
+.chip-parent{background:var(--blue-soft);color:#1D4FA8}
+.chip-ai{background:var(--yellow-soft);color:#7A5600}
+.chip-mint{background:var(--mint-soft);color:#0b5f49}
+.chip-purple{background:var(--purple-soft);color:#4B3FB0}
+.night-bg .chip-ai{background:rgba(255,194,61,.18);color:var(--yellow)}
+
+/* logo */
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--f-head);font-weight:700;font-size:1.3rem;white-space:nowrap}
+.brand img{width:40px;height:40px}
+.brand b{color:var(--coral)}
+
+/* bridge words (dialect → Fusha) */
+.br{border-bottom:3px dotted var(--mint);color:#0b5f49;font-weight:800;cursor:pointer}
+.night-bg .br{color:#7DE3C4;border-color:#7DE3C4}
+
+/* motion */
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes bob{50%{transform:translateY(-8px)}}
+@keyframes pulse{50%{box-shadow:0 0 0 18px rgba(31,163,131,.12)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rise{animation:rise .5s ease both}
+.sv-bob{animation:bob 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.sv-float{animation:bob 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.sv-wiggle{animation:wig 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes wig{25%{transform:rotate(-8deg)}75%{transform:rotate(8deg)}}
+.sv-tw{animation:tw 2.4s ease-in-out infinite}
+@keyframes tw{50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+
+/* layout helpers shared by the landing page and the app */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:center}
+.split.top{align-items:start}
+@media (max-width:900px){.split{grid-template-columns:minmax(0,1fr)}}
+.title{font-size:clamp(2rem,4.6vw,3.4rem)}
+.title em{font-style:normal;color:var(--coral)}
+.night-bg .title em{color:var(--yellow)}
+.lead{font-size:clamp(1.05rem,1.6vw,1.22rem);color:var(--muted);margin-top:12px}
+.night-bg .lead{color:#D9DBF7}
+.stack{display:flex;flex-direction:column;gap:16px}
+.stack>.chip,.stack>.timepill,.stack>p.chip{align-self:flex-start}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}

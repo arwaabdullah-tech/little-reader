@@ -9,6 +9,7 @@ os.environ['MEDIA_DIR'] = tempfile.mkdtemp()
 os.environ['JWT_SECRET'] = 'test-secret-should-never-be-used-in-production'
 os.environ['OPENAI_API_KEY'] = ''
 os.environ['DEMO_MODE'] = '1'
+os.environ['FAST_DEMO'] = '0'
 
 from fastapi.testclient import TestClient  # noqa: E402
 from PIL import Image  # noqa: E402
@@ -182,3 +183,36 @@ def test_delete_account():
     client.post(f'/api/children/{cid}/stories', headers=h, json={'answers': SARA})
     assert client.delete('/api/me', headers=h).json() == {'deleted': True}
     assert client.get('/api/children', headers=h).status_code == 401
+
+
+def test_fast_demo_uses_supplied_assets_without_ai():
+    from unittest.mock import AsyncMock
+    h = auth(); cid = new_child(h, name='شهد').json()['id']
+    forbidden = AsyncMock(side_effect=AssertionError('Fast demo must not call AI'))
+    with patch.object(config, 'FAST_DEMO', True), patch.object(ai, 'configured', lambda: True), \
+         patch.object(ai, 'cartoon_avatar', forbidden), patch.object(ai, 'write_story', forbidden), \
+         patch.object(ai, 'is_safe', forbidden), patch.object(ai, 'cover_art', forbidden):
+        avatar = client.post(f'/api/children/{cid}/avatar', headers=h,
+                             files={'photo': ('p.png', png_bytes(), 'image/png')}, data={'consent': 'true'})
+        assert avatar.status_code == 200 and avatar.json()['avatar_source'] == 'demo'
+        story = client.post(f'/api/children/{cid}/stories', headers=h, json={'answers': main.demo.DAY['ar']}).json()
+        assert story['title'] == 'شهد ونور الصلاة' and story['illustrated_demo']
+        assert story['cover_status'] == 'ready' and len(story['pages']) == 5
+        for page in story['pages']:
+            image = client.get(page['image_url'])
+            assert image.status_code == 200 and image.headers['content-type'] == 'image/png'
+            assert len(page['child_line'].split()) <= 8
+            for role in ('parent', 'child'):
+                voice = client.get(page[f'audio_{role}_url'])
+                assert voice.status_code == 200 and len(voice.content) > 1000
+                assert voice.headers['content-type'] == 'audio/mpeg'
+        assert client.get(story['cover_audio_url']).status_code == 200
+        saved = client.get('/api/stories/' + story['id'], headers=h).json()
+        assert saved['pages'] == story['pages'] and saved['edition'] == 2
+        legacy = new_child(h, name='سارة').json()
+        assert legacy['name'] == 'شهد'
+        assert client.get(story['cover_url'], headers=h).status_code == 200
+        assert client.get('/api/demo-assets/not-an-asset.png').status_code == 404
+        forbidden.assert_not_called()
+    with patch.object(config, 'DEMO_MODE', False):
+        assert client.get('/api/demo-assets/page-1.png').status_code == 404

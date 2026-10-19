@@ -29,6 +29,7 @@ CORS_ORIGINS = [x.strip() for x in os.getenv('CORS_ORIGINS', 'http://localhost:8
 # dashboard, and a ready-made backup story/cartoon if the AI is unreachable.
 # DEMO_MODE=0 (default) is the real website for families.
 DEMO_MODE = _flag('DEMO_MODE', '0')
+FAST_DEMO = _flag('FAST_DEMO', '1')
 # Serve the frontend folder from FastAPI too (handy without Docker): SERVE_FRONTEND=./frontend
 SERVE_FRONTEND = os.getenv('SERVE_FRONTEND', '').strip()
 # Families' local time (Asia/Riyadh = +3). The app sleeps until WAKE_HOUR local time.

@@ -1,0 +1,64 @@
+{
+  "result": "PASS",
+  "decoded_audio": [
+    {
+      "name": "voice-cover",
+      "duration": 9.768,
+      "peak": 0.6966086030006409
+    },
+    {
+      "name": "voice-1-parent",
+      "duration": 25.176,
+      "peak": 0.7543356418609619
+    },
+    {
+      "name": "voice-1-child",
+      "duration": 3.216,
+      "peak": 0.6051381230354309
+    },
+    {
+      "name": "voice-2-parent",
+      "duration": 27.336,
+      "peak": 0.735312819480896
+    },
+    {
+      "name": "voice-2-child",
+      "duration": 3.576,
+      "peak": 0.5772228837013245
+    },
+    {
+      "name": "voice-3-parent",
+      "duration": 25.32,
+      "peak": 0.6569207310676575
+    },
+    {
+      "name": "voice-3-child",
+      "duration": 3.264,
+      "peak": 0.5099209547042847
+    },
+    {
+      "name": "voice-4-parent",
+      "duration": 25.656,
+      "peak": 0.6871988773345947
+    },
+    {
+      "name": "voice-4-child",
+      "duration": 4.272,
+      "peak": 0.5601840615272522
+    },
+    {
+      "name": "voice-5-parent",
+      "duration": 31.464,
+      "peak": 0.7678967714309692
+    },
+    {
+      "name": "voice-5-child",
+      "duration": 4.92,
+      "peak": 0.5617747902870178
+    }
+  ],
+  "autoplay": "10 clips, all 5 pages, resets after completion",
+  "responsive": "desktop and mobile",
+  "legacy_demo_name": "Shahd",
+  "js_errors": []
+}

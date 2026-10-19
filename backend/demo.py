@@ -1,12 +1,37 @@
-"""Ready-made content for presenting: Sara's day, a backup story (used only if the AI is unreachable
+"""Ready-made content for presenting: Shahd's day, a backup story (used only if the AI is unreachable
 and DEMO_MODE=1), and sample history so the parent dashboard is never empty on stage.
 [masculine|feminine] pairs are resolved by the child's gender; {n} is the child's name."""
 import re
 
 DAY = {
-    'ar': ['رحت الحديقة مع أبوي ولعبنا كورة!', 'طحت وعوّرت ركبتي… بس ما بكيت!', 'إيه! أختي الصغيرة ساعدتني!'],
-    'en': ['I went to the park with Dad and we played football!', "I fell and hurt my knee… but I didn't cry!", 'Yes! My little sister helped me!'],
+    'ar': ['اليوم تعلمت في المدرسة كيف أصلي! وعلمتنا المعلمة أن الصلاة تقرّبنا من الله، وكنت مرة مبسوطة!', 'إيه، في البداية نسيت ترتيب حركات الصلاة، وخفت أغلط قدام المعلمة.', 'إيه! ساعدت صديقتي ليان تتذكر كيف نركع ونسجد، وتعلمنا معًا!'],
+    'en': ['Today I learned how to pray at school! Our teacher taught us that prayer brings us closer to Allah. I was so happy!', 'At first I forgot the order of the prayer movements, and I was afraid of making a mistake in front of the teacher.', 'Yes! I helped my friend Layan remember how to bow and prostrate, and we learned together!'],
 }
+
+
+def shahd_story(answers: list[str]) -> dict:
+    """The supplied five-page presentation fixture; never invokes a model."""
+    content = [
+        ('سرّ الابتسامة', 'فتحت شهد باب البيت، وقفزت إلى حضن أمها. كانت تخبّئ خبرًا جميلًا!\nقالت بحماس: «تعلّمنا الصلاة اليوم! قالت المعلمة إن الصلاة تقرّبنا من الله».\nابتسمت أمها وسألت: «وما سرّ هذه الابتسامة الكبيرة؟»', 'تعلّمتُ شيئًا جميلًا اليوم!'),
+        ('شجاعة المحاولة', 'هدأت شهد قليلًا، ثم همست: «نسيت بعض الحركات، وخفت أن أخطئ أمام المعلمة».\nضمّتها أمها وقالت: «نتعلّم خطوةً خطوةً يا شهد. والخطأ لا يمنعنا من المحاولة».\nرفعت شهد رأسها. ربما كانت المحاولة بداية الشجاعة!', 'إذا أخطأتُ، أحاولُ من جديد!'),
+        ('صديقتان وخطوة جديدة', 'تذكّرت شهد ليان، فأشرقت عيناها: «صديقتي نسيت الحركات أيضًا!»\nجلستا معًا، وتذكّرتا الركوع والسجود. كلّما نجحت إحداهما، ابتسمت للأخرى.\nقالت أمها: «ما أجمل أن نتعلّم ونساعد أصدقاءنا!»', 'أنا وليان نتعلّمُ معًا!'),
+        ('قلبي يطمئنّ', 'فرشت أمها سجادة الصلاة، فوقفت شهد بجانبها. أخذت نفسًا هادئًا، وتذكّرت درس المعلمة.\nركعت، ثم سجدت. هذه المرّة لم تستسلم للخوف.\nنظرت إلى أمها مبتسمة؛ لقد أصبحت خطوة اليوم أسهل من الأمس!', 'خطوةً خطوةً، أستطيعُ أن أتعلّم!'),
+        ('نور صغير يكبر', 'أطلّ القمر، واحتضنت شهد دبدوبها تحت الغطاء.\nهمست: «اليوم تعلّمت الصلاة، وساعدت ليان، وحاولت رغم خوفي».\nقبّلتها أمها وقالت: «كلّ خير تفعلينه يترك نورًا في قلبك».\nأغمضت شهد عينيها. وفي قلبها فرحة صغيرة تكبر، وحكاية جديدة تنتظر الغد.', 'في قلبي نورٌ… وغدًا أتعلّمُ أكثر!'),
+    ]
+    return {
+        'title': 'شهد ونور الصلاة', 'illustrated_demo': True, 'edition': 2,
+        'cover_audio_url': '/api/demo-assets/voice-cover.mp3',
+        'pages': [dict(title=title, narration=narration, child_line=line,
+                       scene='night', props=[], fact='', image_url=f'/api/demo-assets/page-{i}.png?v=2',
+                       audio_parent_url=f'/api/demo-assets/voice-{i}-parent.mp3',
+                       audio_child_url=f'/api/demo-assets/voice-{i}-child.mp3')
+                  for i, (title, narration, line) in enumerate(content, 1)],
+        'bridges': [['مبسوطة', 'سعيدة'], ['أغلط', 'أخطئ'], ['سوا', 'معًا']],
+        'words': ['الصلاة', 'تقرّبنا', 'أحاول'], 'facts': [], 'said': answers,
+        'mission': 'تدرّبي مع أمك على ترتيب حركات الصلاة، وساعدي صديقة على تعلم شيء جديد.',
+        'parent_question': 'ما الذي ساعدك على المحاولة من جديد عندما نسيتِ حركات الصلاة؟',
+        'feelings': [['😊', 'تعلم الصلاة'], ['😟', 'الخوف من الخطأ'], ['💛', 'مساعدة ليان']],
+    }
 
 _GENDER = re.compile(r'\[([^\[\]|]*)\|([^\[\]]*)\]')
 
@@ -54,7 +79,7 @@ _EN_PAGES = [
 
 
 def backup_story(name: str, gender: str, lang: str, level: int, answers: list[str]) -> dict:
-    """The demo story (Sara's day), personalised with name, gender and ladder step."""
+    """The demo story (Shahd's day), personalised with name, gender and ladder step."""
     ar = lang == 'ar'
     pages = []
     for scene, props, narration, lines, fact in (_AR_PAGES if ar else _EN_PAGES):

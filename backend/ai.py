@@ -205,12 +205,18 @@ def local_cartoon(photo_png: bytes) -> bytes:
 
 
 # ---------- 4. voice ----------
-async def speak(text: str, lang: str) -> bytes:
+async def speak(text: str, lang: str, role: str = 'narrator') -> bytes:
     style = ('Speak in clear Modern Standard Arabic (فصحى) with correct pronunciation. ' if lang == 'ar' else '')
+    style += ('Perform as a kind father telling an enchanting bedtime story. Use a warm male voice, '
+              'gentle dramatic expression, wonder in happy scenes, reassurance in worried scenes, '
+              'distinct soft character dialogue, and natural pauses. Do not add any words. '
+              if role == 'parent' else
+              'Read as a cheerful, gentle young story character, bright and clear, without exaggeration. '
+              if role == 'child' else 'Read as a warm, expressive bedtime storyteller. ')
     async with httpx.AsyncClient(timeout=90) as client:
         try:
             r = await client.post(f'{API}/audio/speech', headers=_headers(), json={
-                'model': config.TTS_MODEL, 'voice': config.TTS_VOICE, 'input': text[:1500], 'response_format': 'mp3',
+                'model': config.TTS_MODEL, 'voice': 'ash' if role == 'parent' else config.TTS_VOICE, 'input': text[:1500], 'response_format': 'mp3',
                 'instructions': style + 'You are a warm, gentle bedtime storyteller reading to a young child. '
                                         'Slow, calm pace, soft and smiling, with small pauses between sentences.',
             })
