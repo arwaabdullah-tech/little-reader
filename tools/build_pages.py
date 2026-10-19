@@ -24,7 +24,8 @@ for path in OUT.rglob('*'):
         text = text.replace(quote + '/app#', quote + BASE + 'app/#')
         text = text.replace(quote + '/app' + quote, quote + BASE + 'app/' + quote)
         text = text.replace(quote + '/privacy.html', quote + BASE + 'privacy.html')
-        text = text.replace(quote + '/' + quote, quote + BASE + quote)
+    text = text.replace('href="/"', 'href="' + BASE + '"')
+    text = text.replace("location.href = '/'", "location.href = '" + BASE + "'")
     path.write_text(text, encoding='utf-8')
 app = OUT / 'app'
 app.mkdir(exist_ok=True)

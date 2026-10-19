@@ -53,6 +53,10 @@ SERVE_FRONTEND=./frontend uvicorn backend.main:app --port 8080
 
 ## Real website vs presenting
 
+Public hackathon demo: **https://shurooqbawazir34.github.io/little-reader-demo/app/**
+
+The GitHub Pages version runs the scripted workflow entirely in the visitor's browser, with local demo storage and bundled illustrations/voices. It has no live backend, registration service, or AI generation. Its deployment repository is `shurooqbawazir34/little-reader-demo`. Rebuild the export with `python tools/build_pages.py`; the output is `artifacts/pages-host/little-reader-demo/`. Only that export is published; `.env`, original child photos, server data, and local review screenshots are excluded.
+
 ### Fast hackathon presentation
 
 With `DEMO_MODE=1` and `FAST_DEMO=1` (the default in demo mode), the full Shahd workflow uses the supplied assets without calling image, safety, or story models. Upload a child photo, wait about one second for the prepared cartoon, answer the three questions using the microphone simulation or the example button, then open **شهد ونور الصلاة**. All five supplied illustrations appear in order with animated page turns, keyboard navigation, and visible Arabic reading text. The story preparation animation takes a few seconds. Read-aloud plays bundled voices instantly.

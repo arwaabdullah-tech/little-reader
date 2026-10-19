@@ -90,7 +90,7 @@ const SCREENS = { start, setup, photo, night, talk, making, read, goodnight, mor
 async function route() {
   const my = ++routeTok;
   stopAudio(); S.auto = false;
-  const [name, arg] = location.hash.replace(/^#\/?/, '').split('/little-reader-demo/');
+  const [name, arg] = location.hash.replace(/^#\/?/, '').split('/');
   let screen = SCREENS[name] ? name : 'night';
   if (!hasToken()) screen = 'start';
   else if (!S.child && screen !== 'start') {
