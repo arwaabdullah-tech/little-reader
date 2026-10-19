@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1B1F5E">
+<title>القارئ الصغير | Little Reader</title>
+<meta name="description" content="كل ليلة، يتحوّل يوم طفلك إلى كتاب مصوّر بالفصحى بطلُه طفلك، فيه معلومات جديدة، ويقرأه معك في عشر دقائق قبل النوم.">
+<link rel="icon" href="/little-reader-demo/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&family=Tajawal:wght@400;500;700;800&family=Noto+Naskh+Arabic:wght@600;700&family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="/little-reader-demo/assets/css/main.css">
+<link rel="stylesheet" href="/little-reader-demo/assets/css/landing.css">
+</head>
+<body>
+<!-- Product website. Arabic is written in the page; English lives in data-en / data-en-html and is swapped by landing.js. -->
+<header class="lt-top night-bg">
+  <div class="wrap lt-top-in">
+    <a class="brand" href="/little-reader-demo/"><img src="/little-reader-demo/assets/img/logo.svg" alt=""><span data-en-html="Little <b>Reader</b>">القارئ <b>الصغير</b></span></a>
+    <nav class="lt-nav"><a href="#how" data-en="How it works">كيف يعمل</a><a href="#features" data-en="Features">المزايا</a><a href="#parents" data-en="For parents">للوالدين</a><a href="#safe" data-en="Safety">الأمان</a><a href="#faq" data-en="FAQ">الأسئلة الشائعة</a></nav>
+    <button class="pill-l" id="lang" type="button">English</button>
+    <a class="pill-l login-l" href="/little-reader-demo/app/#/start/login" data-en="Sign in">تسجيل الدخول</a>
+    <a class="btn btn-coral btn-sm" href="/little-reader-demo/app/#/start" data-en="Get started">ابدأ الآن</a>
+  </div>
+</header>
+
+<main>
+<!-- hero -->
+<section class="night-bg hero">
+  <div class="wrap split">
+    <div class="stack">
+      <p class="eyebrow" style="color:var(--yellow)" data-en="Bedtime stories for ages 4–8">قصص ما قبل النوم للأعمار من 4 إلى 8</p>
+      <h1 class="title" data-en-html="Tell your day…<br><em>read your story.</em>">احكِ يومك…<br><em>واقرأ حكايتك.</em></h1>
+      <p class="lead" data-en="Every night, your child's day becomes an illustrated book starring them as a cartoon hero, full of new things to learn, read together with you in ten minutes.">كل ليلة، يتحوّل يوم طفلك إلى كتاب مصوّر بالفصحى، بطلُه طفلك برسمة كرتونية، وفيه معلومات جديدة يتعلّمها، تقرآنه معًا في عشر دقائق.</p>
+      <div class="row"><a class="btn btn-coral btn-lg" href="/little-reader-demo/app/#/start" data-en="▶ Get started">▶ ابدأ الآن</a><a class="btn btn-ghost btn-lg" href="#how" data-en="How it works">كيف يعمل؟</a></div>
+      <div class="trust"><span data-en="📱 Phone, tablet & laptop">📱 جوال وجهاز لوحي وحاسوب</span><span data-en="🌍 Arabic & English">🌍 العربية والإنجليزية</span><span data-en="🔒 Private to your family">🔒 خاص بعائلتك</span></div>
+    </div>
+    <div class="mock" aria-hidden="true">
+      <div class="mock-art" id="mockArt"></div>
+      <div class="mock-text">
+        <div class="m-p"><small data-en="👨‍👩‍👧 Parent reads">👨‍👩‍👧 الوالد يقرأ</small><p data-en-html="On a sunny day, Shahd <u>went</u> to the park with her dad.">في يومٍ مشمس، <u>ذهبت</u> شهد إلى الحديقة مع <u>أبيها</u>.</p></div>
+        <div class="m-c"><small data-en="👧 Shahd reads">👧 شهد تقرأ</small><p data-en="We played football together!">لعبنا بالكرة معًا!</p></div>
+        <div class="m-f"><small data-en="💡 Did you know?">💡 هل تعلم؟</small><p data-en="Football is the most played sport in the world.">كرة القدم أكثر رياضة يلعبها الناس في العالم.</p></div>
+        <div class="m-play" data-en="🔊 Hudhud reads this page">🔊 الهدهد يقرأ الصفحة</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- how it works -->
+<section class="lt-sec peach-bg" id="how">
+  <div class="wrap">
+    <p class="eyebrow center" data-en="How it works">كيف يعمل</p>
+    <h2 class="h2 center" data-en-html="Four steps… <em>one new story every night</em>">أربع خطوات… <em>وحكاية جديدة كل ليلة</em></h2>
+    <div class="chevrons">
+      <div class="chev" style="--c:var(--teal)"><b>ح</b><span class="n" data-en="1 · Talk">1 · حديث</span><h3 data-en="Your child tells their day">يحكي طفلك يومه</h3><p data-en="Hudhud the hoopoe asks three gentle questions. Your child answers out loud, in their own words and dialect.">يسأله الهدهد ثلاثة أسئلة لطيفة، فيجيب بصوته وبكلماته ولهجته.</p></div>
+      <div class="chev" style="--c:var(--orange)"><b>ك</b><span class="n" data-en="2 · Book">2 · كتاب</span><h3 data-en="The day becomes a book">يصبح اليوم كتابًا</h3><p data-en="In about a minute: a 5-page illustrated story, your child as the hero, with true facts woven in.">في دقيقة تقريبًا: قصة مصوّرة من 5 صفحات، بطلها طفلك، تتخللها معلومات حقيقية.</p></div>
+      <div class="chev" style="--c:var(--coral)"><b>ا</b><span class="n" data-en="3 · Read">3 · ارتقاء</span><h3 data-en="You read it together">تقرآنه معًا</h3><p data-en="You read your lines, your child reads theirs, in Fusha. Or let Hudhud read it aloud.">تقرأ سطرك ويقرأ طفلك سطره بالفصحى، أو دع الهدهد يقرأ القصة بصوته.</p></div>
+      <div class="chev" style="--c:var(--yellow)"><b>ي</b><span class="n" data-en="4 · Goodnight">4 · يُطوى اليوم</span><h3 data-en="Goodnight">تصبح على خير</h3><p data-en="A tiny kind mission for tomorrow, then lights out. The book stays on their shelf.">مهمة لطيفة صغيرة للغد، ثم النوم. ويبقى الكتاب على رفّ مكتبته.</p></div>
+    </div>
+    <p class="center muted" style="margin-top:18px;font-weight:700" data-en="And in the morning: a short summary for parents ☀️">وفي الصباح: ملخّص قصير للوالدين ☀️</p>
+  </div>
+</section>
+
+<!-- features -->
+<section class="lt-sec" id="features">
+  <div class="wrap">
+    <p class="eyebrow center" data-en="Features">المزايا</p>
+    <h2 class="h2 center" data-en-html="More than a story… <em>a lesson they love</em>">أكثر من قصة… <em>درسٌ يحبّه طفلك</em></h2>
+    <div class="feats">
+      <div class="feat"><i style="background:var(--coral)">🦸</i><h3 data-en="Your child is the hero">طفلك هو البطل</h3><p data-en="Upload a photo once: AI turns it into a friendly cartoon that stars in every book.">ارفع صورة مرة واحدة، ويحوّلها الذكاء الاصطناعي إلى رسمة كرتونية تكون بطلة كل كتاب.</p></div>
+      <div class="feat"><i style="background:var(--yellow)">💡</i><h3 data-en="Something new every night">معلومة جديدة كل ليلة</h3><p data-en="Each story grows from their day into the world: science, nature, the body, animals, culture.">تنطلق كل قصة من يومه إلى العالم: العلوم، والطبيعة، وجسم الإنسان، والحيوانات، والثقافة.</p></div>
+      <div class="feat"><i style="background:var(--mint)">🌉</i><h3 data-en="From dialect to Fusha">من اللهجة إلى الفصحى</h3><p data-en="The words your child said become book words, so Fusha starts from their own voice.">الكلمات التي قالها طفلك باللهجة تصبح كلمات الكتاب بالفصحى، فيبدأ تعلّمها من صوته هو.</p></div>
+      <div class="feat"><i style="background:var(--purple)">🔊</i><h3 data-en="Hudhud reads aloud">الهدهد يقرأ بصوته</h3><p data-en="A warm AI voice can read any page or the whole book, turning the pages by itself.">صوت دافئ بالذكاء الاصطناعي يقرأ أي صفحة أو القصة كاملة ويقلّب الصفحات وحده.</p></div>
+      <div class="feat"><i style="background:var(--blue)">📏</i><h3 data-en="Right for their age">على قدر عمره</h3><p data-en="A 4-year-old reads a word or two; an 8-year-old reads the whole page.">ابن الرابعة يقرأ كلمة أو كلمتين، وابن الثامنة يقرأ الصفحة كاملة.</p></div>
+      <div class="feat"><i style="background:var(--orange)">📚</i><h3 data-en="A library of their life">مكتبة من حياته</h3><p data-en="Every night adds a book to their shelf. Read old ones again whenever you like.">كل ليلة يُضاف كتاب جديد إلى رفّه، ويمكنكما العودة إلى أي كتاب متى شئتما.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- parents -->
+<section class="lt-sec peach-bg" id="parents">
+  <div class="wrap split">
+    <div class="stack">
+      <p class="eyebrow" data-en="For parents">للوالدين</p>
+      <h2 class="h2" data-en-html="Good morning… <em>here is how their day felt</em>">صباح الخير… <em>هكذا كان يوم طفلك</em></h2>
+      <ul class="ticks">
+        <li data-en="A question for breakfast, instead of «how was your day?… fine»">سؤال للفطور، بدل «كيف كان يومك؟… زين»</li>
+        <li data-en="Their feelings this week, in their own words">مشاعر الأسبوع، من كلماته هو</li>
+        <li data-en="New Fusha words and new facts they learned">كلمات الفصحى والمعلومات الجديدة التي تعلّمها</li>
+        <li data-en="Tomorrow's tiny mission, to follow up together">مهمة الغد الصغيرة، لتتابعاها معًا</li>
+        <li data-en="Ten real minutes together every night, with no preparation">عشر دقائق حقيقية معًا كل ليلة، بلا تحضير</li>
+      </ul>
+      <div><a class="btn btn-blue btn-lg" href="/little-reader-demo/app/#/start" data-en="Create your family account">أنشئ حساب عائلتك</a></div>
+    </div>
+    <div class="dash-mock" aria-hidden="true">
+      <div class="dm-row">
+        <div class="dm-k"><b>24</b><span data-en="books">كتابًا</span></div>
+        <div class="dm-k"><b>11 <small data-en="min">د</small></b><span data-en="together">معًا</span></div>
+        <div class="dm-k"><b>67</b><span data-en="new facts">معلومة جديدة</span></div>
+      </div>
+      <div class="dm-q"><small data-en="💬 Today's question for Shahd">💬 سؤال اليوم لشهد</small><p data-en="«How did you feel when you fell? What helped you?»">«كيف شعرتِ عندما وقعتِ؟ وما الذي ساعدك؟»</p></div>
+      <div class="dm-w"><span>ذهبت</span><span>وقعت</span><span>الكرة</span><span>لكنني</span><span>شجاعة</span></div>
+      <div class="dm-f"><span>😊</span><span>⚽</span><span>😣</span><span>💛</span><span>🌙</span><span>🤝</span><span>🥳</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- safety -->
+<section class="lt-sec" id="safe">
+  <div class="wrap">
+    <p class="eyebrow center" data-en="Safety & privacy">الأمان والخصوصية</p>
+    <h2 class="h2 center" data-en-html="Smart… <em>and safe from the first word</em>">ذكي… <em>وآمن من أول كلمة</em></h2>
+    <div class="safe-grid">
+      <div class="safe"><i>🔒</i><b data-en="Parent consent first">موافقة وليّ الأمر أولًا</b><p data-en="Nothing starts until a parent agrees.">لا يبدأ شيء قبل موافقتك.</p></div>
+      <div class="safe"><i>🛡️</i><b data-en="Every story is checked">كل قصة تُفحص</b><p data-en="If a child says something worrying, we write no story and quietly alert the parent.">إن حكى الطفل ما يقلق، لا نكتب قصة وننبّه الوالد بهدوء.</p></div>
+      <div class="safe"><i>🖼️</i><b data-en="No original photos kept">لا نحتفظ بالصورة الأصلية</b><p data-en="Only the cartoon is kept. Voice recordings are never stored.">نحتفظ بالرسمة الكرتونية فقط، ولا نخزّن تسجيلات الصوت.</p></div>
+      <div class="safe"><i>🗑️</i><b data-en="Delete anytime">احذف متى شئت</b><p data-en="One button removes all of a child's books, drawings and data.">زرّ واحد يحذف كل كتب الطفل ورسوماته وبياناته.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- faq -->
+<section class="lt-sec peach-bg" id="faq">
+  <div class="wrap faq">
+    <h2 class="h2 center" data-en="Frequently asked questions">الأسئلة الشائعة</h2>
+    <details><summary data-en="What ages is it for?">لأي عمر يناسب؟</summary><p data-en="Ages 4 to 8. The part your child reads grows with their age, from a word or two up to a whole page.">من 4 إلى 8 سنوات. ويكبر الجزء الذي يقرؤه الطفل مع عمره، من كلمة أو كلمتين إلى صفحة كاملة.</p></details>
+    <details><summary data-en="How long does it take each night?">كم يستغرق كل ليلة؟</summary><p data-en="About ten minutes: three questions, a minute to make the book, then reading together.">نحو عشر دقائق: ثلاثة أسئلة، ودقيقة لصنع الكتاب، ثم القراءة معًا.</p></details>
+    <details><summary data-en="Is the story only about what happened that day?">هل القصة عن أحداث اليوم فقط؟</summary><p data-en="No. The day is the starting point; the story then takes your child further, with Hudhud explaining true facts about the world linked to what happened.">لا. اليوم هو نقطة البداية، ثم تأخذه القصة أبعد، فيشرح له الهدهد معلومات حقيقية عن العالم مرتبطة بما حدث.</p></details>
+    <details><summary data-en="Which languages are supported?">ما اللغات المتاحة؟</summary><p data-en="Arabic (Modern Standard Arabic, with a bridge from the Saudi dialect) and English. You can switch at any time.">العربية الفصحى (مع جسر من اللهجة السعودية) والإنجليزية، ويمكنك التبديل متى شئت.</p></details>
+    <details><summary data-en="Do I have to upload a photo?">هل يجب أن أرفع صورة؟</summary><p data-en="No. You can skip it and use a ready-made cartoon hero.">لا. يمكنك التخطي واستخدام بطل كرتوني جاهز.</p></details>
+    <details><summary data-en="What devices does it work on?">على أي جهاز يعمل؟</summary><p data-en="Any modern browser on a phone, tablet or laptop. No app to install.">أي متصفح حديث على الجوال أو الجهاز اللوحي أو الحاسوب، دون تثبيت تطبيق.</p></details>
+    <details><summary data-en="Who can see my child's stories?">من يرى قصص طفلي؟</summary><p data-en="Only you, signed in to your account. Read our privacy policy for details.">أنت فقط، من حسابك. التفاصيل في سياسة الخصوصية.</p></details>
+  </div>
+</section>
+
+<!-- close -->
+<section class="lt-sec night-bg closing">
+  <div class="wrap center stack" style="align-items:center">
+    <h2 class="title" data-en-html="Every child's day…<br><em>is a story worth reading.</em>">كل يومٍ في حياة طفل…<br><em>حكايةٌ تستحق أن تُقرأ.</em></h2>
+    <p class="lead" data-en="Tonight… what will your child tell?">الليلة… ماذا سيحكي طفلك؟</p>
+    <a class="btn btn-coral btn-lg" href="/little-reader-demo/app/#/start" data-en="▶ Get started">▶ ابدأ الآن</a>
+  </div>
+</section>
+</main>
+
+<footer class="lt-foot">
+  <div class="wrap lt-foot-in">
+    <a class="brand" href="/little-reader-demo/"><img src="/little-reader-demo/assets/img/logo.svg" alt=""><span data-en-html="Little <b>Reader</b>">القارئ <b>الصغير</b></span></a>
+    <nav><a href="#how" data-en="How it works">كيف يعمل</a><a href="#faq" data-en="FAQ">الأسئلة الشائعة</a><a href="/little-reader-demo/privacy.html" data-en="Privacy policy">سياسة الخصوصية</a><a href="/little-reader-demo/app/#/start/login" data-en="Sign in">تسجيل الدخول</a></nav>
+    <p data-en="© 2026 Little Reader">© 2026 القارئ الصغير</p>
+  </div>
+</footer>
+<script type="module" src="/little-reader-demo/assets/js/landing.js"></script>
+</body>
+</html>
