@@ -4,6 +4,7 @@
 import { T, LANGS } from './i18n.js';
 import { DEFS, HUD, FACE_F, FACE_M, sceneSVG } from './art.js';
 import { api, ApiError, blobURL, hasToken, setToken, ttsURL } from './api.js';
+import { icon } from './icons.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -419,6 +420,8 @@ async function making(arg, my) {
 let audioTok = 0, curAudio = null;
 function stopAudio() {
   audioTok++;
+  const button = $('#readBtn');
+  if (button) { button.dataset.playing = 'false'; button.textContent = t('read_page'); }
   if (curAudio) { curAudio.pause(); curAudio = null; }
   try { speechSynthesis.cancel(); } catch (e) { /* not supported */ }
   $$('.speaking').forEach(e => e.classList.remove('speaking'));
@@ -456,6 +459,7 @@ function prefetch(i) {
 async function readAloud() {
   const my = ++audioTok;
   $('#readBtn').textContent = t('stop');
+  $('#readBtn').dataset.playing = 'true';
   if (S.page === 0) await say(S.story.title + '. ' + gx(t('written_from')).replace('{n}', childName()), my);
   else {
     const p = S.story.pages[S.page - 1];
@@ -465,7 +469,7 @@ async function readAloud() {
     $('.cbox') && $('.cbox').classList.add('speaking'); await say(p.child_line, my); $$('.speaking').forEach(e => e.classList.remove('speaking'));
     if (p.fact && my === audioTok) { await pause(350); $('.fact') && $('.fact').classList.add('speaking'); await say(t('did_you_know') + ' ' + p.fact, my); $$('.speaking').forEach(e => e.classList.remove('speaking')); }
   }
-  if (my === audioTok && $('#readBtn')) $('#readBtn').textContent = t('read_page');
+  if (my === audioTok && $('#readBtn')) { $('#readBtn').textContent = t('read_page'); $('#readBtn').dataset.playing = 'false'; }
   return my === audioTok;
 }
 async function autoRead() {
@@ -493,7 +497,7 @@ async function read(id, my) {
     <div class="bnav"><button class="nb" id="prev" aria-label="${esc(t('prev'))}"></button><div class="dots" id="dots"></div><button class="nb" id="next" aria-label="${esc(t('next'))}"></button></div>
   </div></section>`;
   voiceNote(); renderBook();
-  $('#readBtn').onclick = () => { if ($('#readBtn').textContent === t('stop')) { S.auto = false; $('#autoSw').checked = false; stopAudio(); $('#readBtn').textContent = t('read_page'); } else { S.voiceUsed = true; prefetch(S.page); readAloud(); } };
+  $('#readBtn').onclick = () => { if ($('#readBtn').dataset.playing === 'true') { S.auto = false; $('#autoSw').checked = false; stopAudio(); } else { S.voiceUsed = true; prefetch(S.page); readAloud(); } };
   $('#autoSw').onchange = e => { S.auto = e.target.checked; stopAudio(); if (S.auto) autoRead(); else $('#readBtn').textContent = t('read_page'); };
   $('#prev').onclick = () => turn(-1);
   $('#next').onclick = () => turn(1);
@@ -543,7 +547,7 @@ function renderBook() {
       <div class="tip" id="tip" hidden></div>
       <div class="cbox"><span class="face js-face"></span><div style="flex:1"><small>${fill(t('child_reads'))}</small><p class="ctext">${words}</p></div></div>
       ${p.fact ? `<div class="fact"><small>${esc(t('did_you_know'))}</small><p>${esc(p.fact)}</p></div>` : ''}
-      <div class="page-tools"><button class="btn ${done ? 'btn-ghost' : 'btn-coral'} btn-sm" id="childBtn">${done ? fill(t('child_done')) : fill(t('child_btn'))}</button></div>`;
+      ${readingConfirmation(done)}`;
   }
   $('#book').innerHTML = `<div class="art">${art}</div><div class="text">${text}</div>`;
   paintFace();
@@ -562,14 +566,24 @@ function renderBook() {
   });
   $('#childBtn') && ($('#childBtn').onclick = childReads);
 }
-async function childReads() {
-  const page = S.page, btn = $('#childBtn'); if (S.readLines.has(page)) return;
-  btn.disabled = true; btn.textContent = t('child_reading');
-  const ws = $$('.cbox .w');
-  for (const w of ws) { if (page !== S.page) return; ws.forEach(x => x.classList.remove('cur')); w.classList.add('cur', 'ok'); await pause(reduce ? 0 : 420); }
-  ws.forEach(x => x.classList.remove('cur'));
-  S.readLines.add(page);
-  if (page === S.page) { btn.disabled = false; btn.className = 'btn btn-ghost btn-sm'; btn.innerHTML = fill(t('child_done')); }
+function readingConfirmation(done) {
+  return `<div class="page-tools reading-confirmation">
+    <button type="button" class="btn btn-sm read-confirm" id="childBtn" aria-pressed="${done}" aria-describedby="readStatus" title="${esc(t(done ? 'child_unmark' : 'child_mark'))}">
+      ${icon(done ? 'checkCircle' : 'check')}<span>${esc(t('child_confirm'))}</span>
+    </button>
+    <span id="readStatus" class="read-status" role="status" aria-live="polite">${done ? fill(t('child_done')) : ''}</span>
+  </div>`;
+}
+function childReads() {
+  const page = S.page, button = $('#childBtn');
+  if (!button || page < 1) return;
+  const done = !S.readLines.has(page);
+  if (done) S.readLines.add(page); else S.readLines.delete(page);
+  $$('.cbox .w').forEach(word => { word.classList.remove('cur'); word.classList.toggle('ok', done); });
+  button.setAttribute('aria-pressed', String(done));
+  button.title = t(done ? 'child_unmark' : 'child_mark');
+  button.innerHTML = `${icon(done ? 'checkCircle' : 'check')}<span>${esc(t('child_confirm'))}</span>`;
+  $('#readStatus').innerHTML = done ? fill(t('child_done')) : '';
 }
 
 /* ---------- ي goodnight ---------- */

@@ -27,6 +27,9 @@ a{color:inherit}
 img{max-width:100%;display:block}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
+.ui-icon{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.18em;flex-shrink:0;pointer-events:none;overflow:visible}
+.art svg.ui-icon:not([data-scene-icon]){position:static;inset:auto;width:1.15em;height:1.15em}
+.nb .ui-icon{width:1.35rem;height:1.35rem}
 :focus-visible{outline:3px solid var(--purple);outline-offset:3px;border-radius:10px}
 .wrap{width:min(1180px,100% - 32px);margin-inline:auto}
 .eyebrow{font-weight:800;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;color:var(--coral)}

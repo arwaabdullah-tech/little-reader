@@ -1,6 +1,7 @@
 /* Website pages (landing, privacy): Arabic is written in the HTML; English comes from data-en / data-en-html.
    The language choice is shared with the app. */
 import { DEFS, sceneSVG, FACE_F } from './art.js';
+import './icons.js';
 
 const mock = document.getElementById('mockArt');
 if (mock) {

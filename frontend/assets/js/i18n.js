@@ -44,7 +44,7 @@ ar: {
   // reader
   book_no: 'كتاب الليلة رقم {k}', written_from: 'كُتب الليلة من كلمات {n}', start_reading: 'ابدأ القراءة ←', ai_story: '✨ ذكاء اصطناعي', backup_story: 'قصة احتياطية',
   parent_reads: '👨‍👩‍👧 الوالد يقرأ', parent_listens: '👂 الوالد يستمع، والطفل يقرأ الصفحة كلها', child_reads: '👧 {n} [يقرأ|تقرأ]', child_btn: '🎤 {n} [يقرأ|تقرأ]',
-  child_reading: '🎤 أستمع…', child_done: '⭐ [قرأها|قرأتها]!', bridge_tip: '🌉 [قال|قالت] {n} «{s}»، وفي الكتب نقول «{b}»',
+  child_reading: '🎤 أستمع…', child_done: 'أحسنت يا {n}!', child_confirm: 'قرأتها', child_mark: 'تسجيل الجملة كمقروءة', child_unmark: 'إلغاء تسجيل قراءة الجملة', bridge_tip: '🌉 [قال|قالت] {n} «{s}»، وفي الكتب نقول «{b}»',
   did_you_know: '💡 هل تعلم؟', facts_inside: 'في هذا الكتاب {k} معلومات جديدة', read_page: '🔊 الهدهد يقرأ الصفحة', read_all: 'الهدهد يقرأ القصة كاملة', stop: '⏸ إيقاف',
   voice_ai: 'صوت الذكاء الاصطناعي', voice_browser: 'صوت المتصفح', page_of: 'صفحة {i} من {k}', prev: 'السابق', next: 'التالي', finish: 'النهاية ←',
   // goodnight
@@ -101,7 +101,7 @@ en: {
   error_story: 'The book couldn\'t be prepared right now.', retry: 'Try again',
   book_no: 'Tonight\'s book #{k}', written_from: 'Written tonight from {n}\'s own words', start_reading: 'Start reading →', ai_story: '✨ AI', backup_story: 'Backup story',
   parent_reads: '👨‍👩‍👧 Parent reads', parent_listens: '👂 The parent listens; the child reads the whole page', child_reads: '👧 {n} reads', child_btn: '🎤 {n} reads',
-  child_reading: '🎤 Listening…', child_done: '⭐ [He|She] read it!', bridge_tip: '🌉 {n} said «{s}»; in books we say «{b}»',
+  child_reading: '🎤 Listening…', child_done: 'Well done, {n}!', child_confirm: 'I read it', child_mark: 'Mark this sentence as read', child_unmark: 'Unmark this sentence as read', bridge_tip: '🌉 {n} said «{s}»; in books we say «{b}»',
   did_you_know: '💡 Did you know?', facts_inside: '{k} new things to learn in this book', read_page: '🔊 Hudhud reads this page', read_all: 'Hudhud reads the whole story', stop: '⏸ Stop',
   voice_ai: 'AI voice', voice_browser: 'Browser voice', page_of: 'Page {i} of {k}', prev: 'Previous', next: 'Next', finish: 'The end →',
   the_end: 'The end', shelf_h: 'Book #{k} is on your shelf!', shelf_p: 'A new book every night: a whole library starring {n}.',
