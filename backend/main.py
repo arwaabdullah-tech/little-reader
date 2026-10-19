@@ -4,6 +4,7 @@ All private routes need a parent token. Interactive docs: /api/docs"""
 from __future__ import annotations
 
 import hashlib
+import asyncio
 import io
 import json
 import secrets
@@ -97,7 +98,8 @@ def to_local_date(dt: datetime):
 
 def child_json(c: Child) -> dict:
     lang = c.language if c.language in LADDER_NAMES else 'ar'
-    return {'id': c.id, 'name': c.name, 'age': c.age, 'gender': c.gender, 'language': c.language,
+    name = 'شهد' if config.DEMO_MODE and config.FAST_DEMO and c.name.strip().lower() in ('سارة', 'ساره', 'sara', 'sarah') else c.name
+    return {'id': c.id, 'name': name, 'age': c.age, 'gender': c.gender, 'language': c.language,
             'reading_level': c.reading_level, 'ladder_name': LADDER_NAMES[lang][c.reading_level - 1],
             'ladder_progress': c.ladder_progress, 'bedtime': c.bedtime, 'avatar_url': media_url(c.avatar_path),
             'avatar_source': c.avatar_source, 'consent': bool(c.consent_at),
@@ -110,8 +112,12 @@ def book_number(db: Session, c: Child) -> int:
 
 def story_json(s: Story, c: Child, number: Optional[int] = None) -> dict:
     d = json.loads(s.content)
-    return {**d, 'id': s.id, 'child_id': s.child_id, 'title': s.title, 'source': s.source,
-            'cover_url': media_url(s.cover_path), 'cover_status': s.cover_status, 'avatar_url': media_url(c.avatar_path),
+    illustrated = config.DEMO_MODE and d.get('illustrated_demo')
+    if illustrated:
+        d.update(demo.shahd_story(d.get('said', [])))
+        d['lang'] = 'ar'
+    return {**d, 'id': s.id, 'child_id': s.child_id, 'title': d['title'] if illustrated else s.title, 'source': s.source,
+            'cover_url': '/api/demo-assets/page-1.png?v=2' if illustrated else media_url(s.cover_path), 'cover_status': s.cover_status, 'avatar_url': media_url(c.avatar_path),
             'book_number': number, 'created_at': s.created_at.isoformat() + 'Z'}
 
 
@@ -161,7 +167,18 @@ class SpeakRequest(BaseModel):
 # ---------------------------------------------------------------- health & accounts
 @app.get('/api/health')
 def health():
-    return {'status': 'ok', 'ai': ai.configured(), 'demo_mode': config.DEMO_MODE, 'auth': bool(SECRET)}
+    return {'status': 'ok', 'ai': ai.configured(), 'demo_mode': config.DEMO_MODE,
+            'fast_demo': config.DEMO_MODE and config.FAST_DEMO, 'auth': bool(SECRET)}
+
+
+@app.get('/api/demo-assets/{filename}')
+def demo_asset(filename: str):
+    allowed = ['avatar.png', 'voice-cover.mp3'] + [f'page-{i}.png' for i in range(1, 6)] + [
+        f'voice-{i}-{role}.mp3' for i in range(1, 6) for role in ('parent', 'child')]
+    path = Path(__file__).parent / 'demo_assets' / filename
+    if not config.DEMO_MODE or filename not in allowed or not path.is_file():
+        raise HTTPException(404, 'Asset not found')
+    return FileResponse(path)
 
 
 @app.post('/api/auth/guest')
@@ -277,7 +294,12 @@ async def avatar(child_id: str, photo: UploadFile = File(...), consent: bool = F
         raise HTTPException(400, 'Unreadable photo (use JPG, PNG or WebP)')
     source = 'ai'
     try:
-        cartoon = await ai.cartoon_avatar(png)
+        if config.DEMO_MODE and config.FAST_DEMO:
+            await asyncio.sleep(1)
+            cartoon = (Path(__file__).parent / 'demo_assets' / 'avatar.png').read_bytes()
+            source = 'demo'
+        else:
+            cartoon = await ai.cartoon_avatar(png)
     except ai.AIError:
         if not config.DEMO_MODE:
             raise HTTPException(502, 'The cartoon could not be made; check the image model in .env')
@@ -321,7 +343,8 @@ async def create_story(child_id: str, data: DayAnswers, background: BackgroundTa
 
     # 1) safety first: a worrying answer never becomes a story; the parent gets a private note instead
     concern = demo.worrying(answers)
-    if not concern and ai.configured():
+    fast_demo = config.DEMO_MODE and config.FAST_DEMO
+    if not concern and ai.configured() and not fast_demo:
         try:
             concern = not await ai.is_safe(answers)
         except ai.AIError:
@@ -334,14 +357,21 @@ async def create_story(child_id: str, data: DayAnswers, background: BackgroundTa
     # 2) the book
     source = 'ai'
     try:
-        story = await ai.write_story(c.name, c.gender, c.age, c.language, c.reading_level, answers)
+        if fast_demo:
+            await asyncio.sleep(1)
+            story, source = demo.shahd_story(answers), 'demo'
+        else:
+            story = await ai.write_story(c.name, c.gender, c.age, c.language, c.reading_level, answers)
     except ai.AIError:
         if not config.DEMO_MODE:
             raise HTTPException(502, 'The story could not be written; check the text model in .env')
         story, source = demo.backup_story(c.name, c.gender, c.language, c.reading_level, answers), 'demo'
-    story.update({'said': answers, 'ladder_step': c.reading_level, 'lang': c.language, 'safety_checked': True})
+    story.update({'said': answers, 'ladder_step': c.reading_level, 'lang': 'ar' if fast_demo else c.language, 'safety_checked': True})
     s = Story(user_id=u.id, child_id=c.id, title=story['title'], content=json.dumps(story, ensure_ascii=False),
-              source=source, cover_status='pending' if ai.configured() else 'none')
+              source=source, cover_status='pending' if ai.configured() and not fast_demo else 'none')
+    if fast_demo:
+        s.cover_path = save_png((Path(__file__).parent / 'demo_assets' / 'page-1.png').read_bytes())
+        s.cover_status = 'ready'
     db.add(s); db.commit()
     if s.cover_status == 'pending':
         background.add_task(make_cover, s.id)
@@ -355,7 +385,8 @@ def shelf(child_id: str, u: User = Depends(current_user), db: Session = Depends(
     first = demo.SAMPLE_BOOKS if config.DEMO_MODE else 0
     total = len(stories)
     return {'sample_books': first, 'stories': [
-        {'id': s.id, 'title': s.title, 'cover_url': media_url(s.cover_path), 'cover_status': s.cover_status,
+        {'id': s.id, 'title': s.title,
+         'cover_url': '/api/demo-assets/page-1.png?v=2' if config.DEMO_MODE and json.loads(s.content).get('illustrated_demo') else media_url(s.cover_path), 'cover_status': s.cover_status,
          'book_number': first + total - i, 'created_at': s.created_at.isoformat() + 'Z'} for i, s in enumerate(stories)]}
 
 

@@ -24,7 +24,7 @@ let routeTok = 0;
 /* ---------- words ---------- */
 const t = k => (T[S.lang] && T[S.lang][k] !== undefined ? T[S.lang][k] : T.en[k]);
 const gx = s => String(s ?? '').replace(/\[([^\[\]|]*)\|([^\[\]]*)\]/g, (_, m, f) => (S.child && S.child.gender === 'm' ? m : f));
-const childName = () => (S.child ? S.child.name : t('default_name_f'));
+const childName = () => (S.health.fast_demo ? (S.lang === 'ar' ? 'شهد' : 'Shahd') : S.child ? S.child.name : t('default_name_f'));
 function fill(s, x = {}) {
   let r = esc(gx(s)).replaceAll('{n}', esc(childName()));
   for (const k in x) r = r.replaceAll('{' + k + '}', esc(gx(x[k])));
@@ -62,7 +62,8 @@ function journey(active) {
 }
 async function loadFace() {
   S.face = S.child && S.child.gender === 'm' ? FACE_M : FACE_F;
-  if (S.child && S.child.avatar_url) S.face = (await blobURL(S.child.avatar_url)) || S.face;
+  if (S.health.fast_demo) S.face = '/api/demo-assets/avatar.png';
+  else if (S.child && S.child.avatar_url) S.face = (await blobURL(S.child.avatar_url)) || S.face;
   paintFace();
 }
 function paintFace() {
@@ -226,20 +227,23 @@ async function photo() {
       <div class="frame hero"><div class="img js-face" id="after"></div><span class="cap">${esc(t('photo_after'))}</span></div>
     </div></div></section>`;
   paintFace();
-  if (S.child.avatar_source) { $('#drawnBy').hidden = false; $('#drawnBy').textContent = t(S.child.avatar_source === 'ai' ? 'drawn_ai' : 'drawn_local'); }
+  if (S.child.avatar_source) { $('#drawnBy').hidden = false; $('#drawnBy').textContent = t(S.child.avatar_source === 'demo' ? 'drawn_demo' : S.child.avatar_source === 'ai' ? 'drawn_ai' : 'drawn_local'); }
   $('#pick').onclick = e => { e.preventDefault(); $('#file').click(); };
   $('#file').onchange = async () => {
     const f = $('#file').files[0]; if (!f) return;
-    $('#before').style.backgroundImage = `url("${URL.createObjectURL(f)}")`; $('#before').textContent = '';
-    $('#after').insertAdjacentHTML('beforeend', `<div class="drawing" id="drawing"><div class="spinner"></div>${esc(t('drawing'))}<small class="note">${esc(t('drawing_tip'))}</small></div>`);
+    const preview = URL.createObjectURL(f);
+    $('#before').style.backgroundImage = `url("${preview}")`; $('#before').textContent = '';
+    $('#after').insertAdjacentHTML('beforeend', `<div class="drawing" id="drawing"><div class="spinner"></div>${esc(t('drawing'))}<small class="note">${esc(S.health.fast_demo ? (S.lang === 'ar' ? 'لحظة واحدة ويصبح بطلك جاهزًا' : 'Your hero will be ready in a moment') : t('drawing_tip'))}</small></div>`);
     $('#goNight').disabled = true; $('#pick').textContent = t('retake');
+    $('#file').disabled = true; $('#skip').disabled = true;
     const form = new FormData(); form.append('photo', f); form.append('consent', 'true');
     try {
       S.child = await api(`/children/${S.child.id}/avatar`, { method: 'POST', form });
       await loadFace();
-      $('#drawnBy').hidden = false; $('#drawnBy').textContent = t(S.child.avatar_source === 'ai' ? 'drawn_ai' : 'drawn_local');
+      $('#drawnBy').hidden = false; $('#drawnBy').textContent = t(S.child.avatar_source === 'demo' ? 'drawn_demo' : S.child.avatar_source === 'ai' ? 'drawn_ai' : 'drawn_local');
     } catch (err) { toast(err.status === 400 || err.status === 413 ? err.message : errMsg(err)); }
     $('#drawing') && $('#drawing').remove(); $('#goNight').disabled = false; $('#file').value = '';
+    $('#file').disabled = false; $('#skip').disabled = false;
   };
   $('#goNight').onclick = $('#skip').onclick = () => go('#/night');
 }
@@ -340,11 +344,11 @@ async function talk() {
 async function demoAnswer() {
   const my = routeTok, mic = $('#mic');
   mic.classList.add('on'); mic.disabled = true; $('#micLbl').textContent = t('listening');
-  await pause(reduce ? 0 : 1300); if (my !== routeTok) return;
+  await pause(reduce ? 0 : S.health.fast_demo ? 450 : 1300); if (my !== routeTok) return;
   const full = t('day')[S.answers.length];
   const b = document.createElement('div'); b.className = 'bubble c'; b.innerHTML = `<small>${fill(t('you_said'))}</small><span></span>`;
   $('#chat').appendChild(b); b.scrollIntoView({ block: 'nearest' });
-  for (let i = 1; i <= full.length; i++) { if (my !== routeTok) return; $('span', b).textContent = full.slice(0, i); await pause(reduce ? 0 : 28); }
+  for (let i = 1; i <= full.length; i++) { if (my !== routeTok) return; $('span', b).textContent = full.slice(0, i); await pause(reduce ? 0 : S.health.fast_demo ? 8 : 28); }
   await pause(400); if (my !== routeTok) return;
   S.answers.push(full); talk();
 }
@@ -388,7 +392,7 @@ async function making(arg, my) {
   const req = api(`/children/${S.child.id}/stories`, { method: 'POST', body: { answers: S.answers } });
   setTimeout(() => { if (my === routeTok && $('#st0').classList.contains('active')) { mark(0, 'done'); mark(1, 'active'); } }, 1400);
   let res;
-  try { res = await req; } catch (e) {
+  try { res = await req; if (S.health.fast_demo) { mark(0, 'done'); mark(1, 'active'); await pause(reduce ? 0 : 500); } } catch (e) {
     if (my !== routeTok) return;
     $('#mkEnd').innerHTML = `<p class="lead">${esc(e.status === 409 ? t('asleep_lock') : t('error_story'))}</p><button class="btn btn-coral" id="retry">${esc(t('retry'))}</button>`;
     $('#retry').onclick = () => making(arg, routeTok);
@@ -416,54 +420,77 @@ async function making(arg, my) {
 }
 
 /* ---------- ا read together: the open book ---------- */
-let audioTok = 0, curAudio = null;
+let audioTok = 0, curAudio = null, finishAudio = null;
 function stopAudio() {
   audioTok++;
   if (curAudio) { curAudio.pause(); curAudio = null; }
+  if (finishAudio) { finishAudio(); finishAudio = null; }
   try { speechSynthesis.cancel(); } catch (e) { /* not supported */ }
   $$('.speaking').forEach(e => e.classList.remove('speaking'));
 }
 function playURL(url, my) {
-  return new Promise(res => {
+  return new Promise((res, reject) => {
     if (my !== audioTok) return res();
     const a = new Audio(url); curAudio = a;
-    a.onended = a.onerror = () => res();
-    a.play().catch(() => res());
+    const clean = () => { if (curAudio === a) { curAudio = null; finishAudio = null; } };
+    finishAudio = () => { clean(); res(); };
+    a.onended = () => { clean(); res(); };
+    a.onerror = () => { clean(); reject(new Error('Audio could not be loaded')); };
+    a.play().catch(e => { clean(); reject(e); });
   });
 }
 function browserSay(text, my) {
-  return new Promise(res => {
-    if (my !== audioTok || !('speechSynthesis' in window)) return res();
+  return new Promise((res, reject) => {
+    if (my !== audioTok) return res();
+    if (!('speechSynthesis' in window)) return reject(new Error('Speech is not supported'));
     const u = new SpeechSynthesisUtterance(text); u.lang = (LANGS[storyLang()] || LANGS.ar).speech; u.rate = .85;
-    u.onend = u.onerror = () => res();
+    const voices = speechSynthesis.getVoices();
+    const arabic = voices.find(v => v.lang.startsWith('ar-SA')) || voices.find(v => v.lang.startsWith('ar'));
+    if (storyLang() === 'ar' && !arabic) return reject(new Error('Arabic voice is not installed'));
+    if (storyLang() === 'ar') u.voice = arabic;
+    u.onend = () => res(); u.onerror = () => my !== audioTok ? res() : reject(new Error('Speech failed'));
     speechSynthesis.speak(u);
   });
 }
 async function say(text, my) {
   text = plain(text).trim(); if (!text) return;
   if (S.health.ai && S.voiceOK !== false) {
-    try { const url = await ttsURL(text, storyLang()); S.voiceOK = true; voiceNote(); return playURL(url, my); }
+    try { const url = await ttsURL(text, storyLang()); S.voiceOK = true; voiceNote(); return await playURL(url, my); }
     catch (e) { S.voiceOK = false; voiceNote(); }
   }
   return browserSay(text, my);
 }
-function voiceNote() { const n = $('#voiceNote'); if (n) n.textContent = '🎙 ' + t(S.health.ai && S.voiceOK !== false ? 'voice_ai' : 'voice_browser'); }
+function voiceNote() { const n = $('#voiceNote'); if (n) n.textContent = S.story?.illustrated_demo ? (S.lang === 'ar' ? '🎙 أصوات مولّدة بالذكاء الاصطناعي · راوٍ دافئ وقراءة تعبيريّة' : '🎙 AI voices · expressive storytelling') : '🎙 ' + t(S.health.ai && S.voiceOK !== false ? 'voice_ai' : 'voice_browser'); }
 function prefetch(i) {
+  if (S.story?.illustrated_demo) return;
   if (!S.health.ai || S.voiceOK === false || !S.story) return;
   const p = S.story.pages[i - 1]; if (!p) return;
   [p.narration, p.child_line, p.fact && t('did_you_know') + ' ' + p.fact].filter(Boolean).forEach(x => ttsURL(plain(x).trim(), storyLang()).catch(() => {}));
 }
-async function readAloud() {
+async function readAloud(mode = 'all') {
+  stopAudio();
   const my = ++audioTok;
   $('#readBtn').textContent = t('stop');
-  if (S.page === 0) await say(S.story.title + '. ' + gx(t('written_from')).replace('{n}', childName()), my);
+  try {
+  const demoVoice = async (url, text) => {
+    if (url) { try { return await playURL(url, my); } catch (e) { if (my !== audioTok) return; } }
+    if (my === audioTok) return say(text, my);
+  };
+  if (S.page === 0) await demoVoice(S.story.cover_audio_url, S.story.title + '. ' + gx(t('written_from')).replace('{n}', childName()));
   else {
     const p = S.story.pages[S.page - 1];
-    if (p.narration) { $('.pbox') && $('.pbox').classList.add('speaking'); await say(p.narration, my); $$('.speaking').forEach(e => e.classList.remove('speaking')); }
+    if (p.narration && mode !== 'child') { $('.pbox') && $('.pbox').classList.add('speaking'); await demoVoice(p.audio_parent_url, p.narration); $$('.speaking').forEach(e => e.classList.remove('speaking')); }
     if (my !== audioTok) return;
     await pause(350);
-    $('.cbox') && $('.cbox').classList.add('speaking'); await say(p.child_line, my); $$('.speaking').forEach(e => e.classList.remove('speaking'));
+    if (mode !== 'parent') { $('.cbox') && $('.cbox').classList.add('speaking'); await demoVoice(p.audio_child_url, p.child_line); $$('.speaking').forEach(e => e.classList.remove('speaking')); }
     if (p.fact && my === audioTok) { await pause(350); $('.fact') && $('.fact').classList.add('speaking'); await say(t('did_you_know') + ' ' + p.fact, my); $$('.speaking').forEach(e => e.classList.remove('speaking')); }
+  }
+  } catch (e) {
+    if (my === audioTok) { S.auto = false; $('#autoSw').checked = false; toast(S.lang === 'ar' ? 'تعذّر تشغيل الصوت. اضغط القراءة للمحاولة مجددًا.' : 'Audio could not play. Tap read to retry.'); }
+    return false;
+  } finally {
+    if (my === audioTok) $$('.speaking').forEach(e => e.classList.remove('speaking'));
+    if (my === audioTok && $('#readBtn')) $('#readBtn').textContent = t('read_page');
   }
   if (my === audioTok && $('#readBtn')) $('#readBtn').textContent = t('read_page');
   return my === audioTok;
@@ -474,9 +501,9 @@ async function autoRead() {
     prefetch(S.page + 1);
     const finished = await readAloud();
     if (!finished || !S.auto || myRoute !== routeTok) return;
-    if (S.page >= S.story.pages.length) { S.auto = false; renderBook(); return; }
+    if (S.page >= S.story.pages.length) { S.auto = false; $('#autoSw').checked = false; renderBook(); return; }
     await pause(900); if (!S.auto || myRoute !== routeTok) return;
-    S.page++; renderBook();
+    S.page++; renderBook(); animatePage(1);
   }
 }
 async function read(id, my) {
@@ -489,10 +516,11 @@ async function read(id, my) {
     <div class="audio">
       <div class="row"><button class="btn btn-ghost btn-sm" id="readBtn">${esc(t('read_page'))}</button>
         <label class="switch"><input type="checkbox" id="autoSw" ${S.auto ? 'checked' : ''}>${esc(t('read_all'))}</label></div>
-      <span class="voice-note" id="voiceNote"></span></div>
+      <span class="voice-note" id="voiceNote"></span><button class="sound-toggle" id="pageSound" aria-pressed="${store.get('lr_page_sound', '1') === '1'}">${S.lang === 'ar' ? 'صوت تقليب الصفحات' : 'Page turn sound'} ${store.get('lr_page_sound', '1') === '1' ? '🔊' : '🔇'}</button></div>
     <div class="bnav"><button class="nb" id="prev" aria-label="${esc(t('prev'))}"></button><div class="dots" id="dots"></div><button class="nb" id="next" aria-label="${esc(t('next'))}"></button></div>
   </div></section>`;
   voiceNote(); renderBook();
+  $('#pageSound').onclick = () => { const enabled = store.get('lr_page_sound', '1') !== '1'; store.set('lr_page_sound', enabled ? '1' : '0'); $('#pageSound').setAttribute('aria-pressed', enabled); $('#pageSound').textContent = (S.lang === 'ar' ? 'صوت تقليب الصفحات ' : 'Page turn sound ') + (enabled ? '🔊' : '🔇'); if (enabled) pageTurnSound(); };
   $('#readBtn').onclick = () => { if ($('#readBtn').textContent === t('stop')) { S.auto = false; $('#autoSw').checked = false; stopAudio(); $('#readBtn').textContent = t('read_page'); } else { S.voiceUsed = true; prefetch(S.page); readAloud(); } };
   $('#autoSw').onchange = e => { S.auto = e.target.checked; stopAudio(); if (S.auto) autoRead(); else $('#readBtn').textContent = t('read_page'); };
   $('#prev').onclick = () => turn(-1);
@@ -506,11 +534,41 @@ async function read(id, my) {
   if (S.story.cover_status === 'pending') pollCover(routeTok);
 }
 function turn(d) {
+  if ($('#book')?.classList.contains('turning')) return;
   S.auto = false; const sw = $('#autoSw'); if (sw) sw.checked = false; stopAudio();
   const last = S.story.pages.length;
   if (d > 0 && S.page >= last) return go('#/goodnight/' + S.story.id);
   S.page = Math.max(0, Math.min(last, S.page + d)); renderBook();
+  if ($('#readBtn')) $('#readBtn').textContent = t('read_page');
+  animatePage(d);
   if (S.voiceUsed) prefetch(S.page);
+}
+function animatePage(direction) {
+  pageTurnSound();
+  const book = $('#book');
+  if (!book || reduce) return;
+  book.style.setProperty('--turn-angle', `${direction * (document.documentElement.dir === 'rtl' ? -1 : 1) * 12}deg`);
+  book.classList.add('turning');
+  book.addEventListener('animationend', () => book.classList.remove('turning'), { once: true });
+}
+let pageAudioContext;
+function pageTurnSound() {
+  if (store.get('lr_page_sound', '1') !== '1') return;
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    pageAudioContext ||= new AudioCtx();
+    pageAudioContext.resume().catch(() => {});
+    const ctx = pageAudioContext, duration = .32;
+    const buffer = ctx.createBuffer(1, ctx.sampleRate * duration, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1);
+    const source = ctx.createBufferSource(), filter = ctx.createBiquadFilter(), gain = ctx.createGain();
+    source.buffer = buffer; filter.type = 'bandpass'; filter.frequency.value = 1600; filter.Q.value = .65;
+    const now = ctx.currentTime;
+    gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(.2, now + .065);
+    gain.gain.exponentialRampToValueAtTime(.001, now + duration);
+    source.connect(filter).connect(gain).connect(ctx.destination); source.start(); source.stop(now + duration);
+  } catch (e) { /* page navigation remains available on devices without Web Audio */ }
 }
 async function pollCover(my) {
   for (let i = 0; i < 40 && my === routeTok; i++) {
@@ -529,7 +587,7 @@ function renderBook() {
   const B = S.story, last = B.pages.length;
   let art, text;
   if (S.page === 0) {
-    art = (S.cover ? `<img src="${S.cover}" alt="">` : sceneSVG('night')) + `<span class="badge chip ${B.source === 'ai' ? 'chip-ai' : 'chip-purple'}">${esc(t(B.source === 'ai' ? 'ai_story' : 'backup_story'))}</span>`;
+    art = (S.cover ? `<img src="${S.cover}" alt="">` : sceneSVG('night')) + `<span class="badge chip ${B.source === 'ai' ? 'chip-ai' : 'chip-purple'}">${esc(B.illustrated_demo ? (S.lang === 'ar' ? '✨ تجربة الحكاية بالذكاء الاصطناعي' : '✨ AI story demo') : t(B.source === 'ai' ? 'ai_story' : 'backup_story'))}</span>`;
     text = `<span class="chip chip-child">📚 ${fill(t('book_no'), { k: String(B.book_number || '') })}</span>
       <h1 class="cover-t">${esc(B.title)}</h1><p class="muted">${fill(t('written_from'))}</p>
       ${(B.facts || []).length ? `<p class="chip chip-ai">💡 ${fill(t('facts_inside'), { k: String(B.facts.length) })}</p>` : ''}
@@ -545,7 +603,22 @@ function renderBook() {
       ${p.fact ? `<div class="fact"><small>${esc(t('did_you_know'))}</small><p>${esc(p.fact)}</p></div>` : ''}
       <div class="page-tools"><button class="btn ${done ? 'btn-ghost' : 'btn-coral'} btn-sm" id="childBtn">${done ? fill(t('child_done')) : fill(t('child_btn'))}</button></div>`;
   }
-  $('#book').innerHTML = `<div class="art">${art}</div><div class="text">${text}</div>`;
+  const illustrated = B.illustrated_demo && S.page > 0;
+  $('#book').classList.toggle('illustrated', !!illustrated);
+  if (illustrated) {
+    const p = B.pages[S.page - 1];
+    $('#book').innerHTML = `<div class="story-spread" dir="rtl">
+      <figure class="story-illustration"><img src="${esc(p.image_url)}" alt="${esc(p.title)}" fetchpriority="high"><figcaption>شهد ونور الصلاة <span dir="ltr">${S.page} / ${last}</span></figcaption></figure>
+      <article class="story-copy"><div class="story-eyebrow">حكاية الليلة <span>✦</span> الصفحة ${S.page}</div><h2>${esc(p.title)}</h2>
+      <div class="pbox"><div class="reading-label"><small>يقرأ الوالد</small><button class="voice-part" id="parentVoice" aria-label="استمع إلى صوت الراوي">🔊 استمع للراوي</button></div><p class="ntext">${esc(p.narration)}</p></div>
+      <div class="cbox"><div><div class="reading-label"><small>تقرأ شهد</small><button class="voice-part" id="childVoice" aria-label="استمع إلى جملة شهد">🔊 استمع لشهد</button></div><p class="ctext">${wordsForPage(p, S.readLines.has(S.page))}</p></div></div>
+      <button class="btn btn-coral btn-sm" id="childBtn">${S.readLines.has(S.page) ? '✓ أحسنتِ يا شهد!' : '✓ قرأتُ جملتي'}</button></article></div>`;
+    $('#parentVoice').onclick = () => { S.auto = false; $('#autoSw').checked = false; readAloud('parent'); };
+    $('#childVoice').onclick = () => { S.auto = false; $('#autoSw').checked = false; readAloud('child'); };
+    if (S.page < last) { const next = new Image(); next.src = B.pages[S.page].image_url; }
+  } else {
+    $('#book').innerHTML = `<div class="art">${art}</div><div class="text">${text}</div>`;
+  }
   paintFace();
   $('#dots').innerHTML = Array.from({ length: last + 1 }, (_, i) => `<i class="${i === S.page ? 'on' : ''}"></i>`).join('');
   const rtl = document.documentElement.dir === 'rtl';
@@ -561,6 +634,9 @@ function renderBook() {
     const tip = $('#tip'); tip.hidden = false; tip.innerHTML = fill(t('bridge_tip'), { s: pair[0], b: pair[1] });
   });
   $('#childBtn') && ($('#childBtn').onclick = childReads);
+}
+function wordsForPage(page, done) {
+  return plain(page.child_line).split(/\s+/).map(w => `<span class="w${done ? ' ok' : ''}">${esc(w)}</span>`).join(' ');
 }
 async function childReads() {
   const page = S.page, btn = $('#childBtn'); if (S.readLines.has(page)) return;

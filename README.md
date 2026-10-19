@@ -53,12 +53,24 @@ SERVE_FRONTEND=./frontend uvicorn backend.main:app --port 8080
 
 ## Real website vs presenting
 
+### Fast hackathon presentation
+
+With `DEMO_MODE=1` and `FAST_DEMO=1` (the default in demo mode), the full Shahd workflow uses the supplied assets without calling image, safety, or story models. Upload a child photo, wait about one second for the prepared cartoon, answer the three questions using the microphone simulation or the example button, then open **شهد ونور الصلاة**. All five supplied illustrations appear in order with animated page turns, keyboard navigation, and visible Arabic reading text. The story preparation animation takes a few seconds. Read-aloud plays bundled voices instantly.
+
+This is a scripted presentation: the cartoon and story stay Shahd's regardless of the uploaded photo or entered answers. Small demo labels identify the preview. The original uploaded photo is validated in memory and discarded. Supplied illustrations live in `backend/demo_assets/` and are included in the API Docker image.
+
+The second edition uses the five text-free illustrations and a clear two-page layout: a full illustration beside editable Arabic story text, with a short child reading line. Existing illustrated demo books automatically display the current edition. Old demo profiles named Sara display as Shahd; real-mode profiles are unaffected.
+
+Eleven bundled Arabic MP3s make the cover, father narration, and Shahd's lines playable immediately, even without a working OpenAI key. These are synthetic voices (Saudi Arabic Hamed for narration, Zariyah for the child lines), not recordings of the family. Page turns use a quiet synthesized paper sound with a mute control. To regenerate the audio, install the optional preparation dependency `pip install edge-tts==7.3.1`, then run `python -m backend.prepare_demo_audio --provider edge`. Alternatively, use `python -m backend.prepare_demo_audio` with a valid OpenAI key exported in the environment for an expressive father performance using the configured TTS model. Existing MP3s are preserved; remove the specific clips you intend to regenerate first. No audio generation service is needed during the demo.
+
+Set `FAST_DEMO=0` to exercise live AI with the original demo fallback behavior, or `DEMO_MODE=0` for real family use. After changing these settings or backend assets, run `docker compose up -d --build`.
+
 **`DEMO_MODE=0`: the real website.** Parents create an account (email + password), add their child, and use it every night. Only real data is shown. After goodnight the app sleeps until 7:00. If the AI fails, the parent sees an error instead of a backup story. In the Talk step anyone can tap "💡 جرّب بمثال" to try an example day.
 
 **`DEMO_MODE=1`: presenting.** Use this on stage:
 
 - "▶ ابدأ التجربة" starts as a guest in one click.
-- Pressing the mic "listens" and types Sara's ready answers, so the audience sees the whole journey. Turn this off in the parents' settings to use the real microphone.
+- Pressing the mic "listens" and types Shahd's ready answers, so the audience sees the whole journey. Turn this off in the parents' settings to use the real microphone.
 - There's no bedtime lock: "🌙 ليلة جديدة" starts another night.
 - The parents' page shows sample history, so tonight's book is #24.
 - If the AI is unreachable, a ready-made story and a simple cartoon filter are used, so the demo never stops.

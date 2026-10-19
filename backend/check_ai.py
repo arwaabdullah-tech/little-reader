@@ -37,15 +37,15 @@ async def main(images: bool) -> int:
     voice = {}
 
     async def safety():
-        assert await ai.is_safe(answers), 'the safety check said Sara\'s day is unsafe'
-        return 'Sara\'s day is safe'
+        assert await ai.is_safe(answers), 'the safety check said Shahd\'s day is unsafe'
+        return 'Shahd\'s day is safe'
 
     async def story():
-        s = await ai.write_story('سارة', 'f', 5, 'ar', 2, answers)
+        s = await ai.write_story('شهد', 'f', 5, 'ar', 2, answers)
         return f'«{s["title"]}» · {len(s["pages"])} pages · {len(s["facts"])} facts · e.g. {s["facts"][0] if s["facts"] else "-"}'
 
     async def speak():
-        voice['mp3'] = await ai.speak('في يومٍ مشمس، ذهبت سارة إلى الحديقة مع أبيها.', 'ar')
+        voice['mp3'] = await ai.speak('في يومٍ مشمس، ذهبت شهد إلى الحديقة مع أبيها.', 'ar')
         return f'{len(voice["mp3"]) // 1024} KB mp3'
 
     async def listen():
